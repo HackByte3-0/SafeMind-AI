@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     
+    'accounts.apps.AccountsConfig'
+    
 ]
 
 MIDDLEWARE = [
@@ -134,6 +136,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -147,5 +151,10 @@ AUTHENTICATION_BACKENDS =[
 
 SITE_ID=1
 
-LOGIN_REDIRECT_URL = '/'  
+LOGIN_REDIRECT_URL = 'complete-profile'  
 LOGOUT_REDIRECT_URL = '/'
+
+# ACCOUNT_SIGNUP_REDIRECT_URL = '/complete-profile/'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
