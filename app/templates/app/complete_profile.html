@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-complete-form">
+    <h2>Complete Your Profile</h2>
+    <p>Please take a moment to complete your profile information.</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Profile</button>
+    </form>
+</div>
+{% endblock %}

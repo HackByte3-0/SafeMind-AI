@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -21,3 +23,7 @@ def how_to_use(request):
 
 def book_consultation(request):
     return render(request, 'app/book_consultation.html')
+
+
+
+
