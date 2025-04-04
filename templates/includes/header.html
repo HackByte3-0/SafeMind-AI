@@ -1,128 +1,65 @@
-<header class="border-b">
+<header class="border-b border-gray-200 shadow-sm bg-white">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
+    <div class="flex items-center justify-between h-20">
       <div class="flex items-center">
-        <!-- Replace with an appropriate logo or icon -->
-        <svg
-          class="h-8 w-8 text-primary"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"
-          />
+        <!-- Logo with gradient -->
+        <svg class="h-10 w-10 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <defs>
+            <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3B82F6" />
+              <stop offset="100%" stop-color="#10B981" />
+            </linearGradient>
+          </defs>
+          <path stroke="url(#logo-gradient)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
         </svg>
-        <span class="ml-2 text-2xl font-bold text-primary">HealthTech</span>
+        <span class="ml-3 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-green-500">SafeMinds</span>
       </div>
+      
       <nav class="hidden md:block">
-        <ul class="flex space-x-4 py-1 items-center">
-          <li>
-            <a
-              href="{% url 'home' %}"
-              class="text-muted-foreground font-semibold hover:underline"
-              >Home</a
-            >
-          </li>
-          <li>
-            <a
-              href="{% url 'dashboard' %}"
-              class="text-muted-foreground font-semibold hover:underline"
-              >Assessment</a
-            >
-          </li>
-          <li>
-            <a
-              href="{% url 'about' %}"
-              class="text-muted-foreground font-semibold hover:underline"
-              >About</a
-            >
-          </li>
+        <ul class="flex space-x-8 py-1 items-center">
+          <li><a href="{% url 'home' %}" class="text-gray-700 font-medium hover:text-blue-600 transition duration-200">Home</a></li>
+          <li><a href="{% url 'dashboard' %}" class="text-gray-700 font-medium hover:text-blue-600 transition duration-200">Assessment</a></li>
+          <li><a href="{% url 'about' %}" class="text-gray-700 font-medium hover:text-blue-600 transition duration-200">About</a></li>
           <li>
             {% if user.is_authenticated %}
-            <a
-              href="{% url 'account_logout' %}"
-              class="text-muted-foreground font-semibold hover:underline"
-            >
-              <button
-                class="bg-red-600 text-white font-semibold py-1 px-4 rounded-lg shadow-md hover:bg-red-700 transition duration-200"
-              >
-                Sign Out
-              </button>
-            </a>
+              <a href="{% url 'account_logout' %}">
+                <button class="bg-gradient-to-r from-red-500 to-red-700 text-white font-medium py-2 px-5 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition duration-300">
+                  Sign Out
+                </button>
+              </a>
             {% else %}
-            <a
-              href="{% url 'account_login' %}"
-              class="text-muted-foreground font-semibold hover:underline"
-            >
-              <button
-                class="bg-green-600 text-white font-semibold py-1 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-200"
-              >
-                Sign In
-              </button>
-            </a>
+              <a href="{% url 'account_login' %}">
+                <button class="bg-gradient-to-r from-blue-500 to-green-500 text-white font-medium py-2 px-5 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition duration-300">
+                  Sign In
+                </button>
+              </a>
             {% endif %}
-            <!-- <a href="{% url 'account_login' %}" class="text-muted-foreground font-semibold hover:underline">
-                            <button class="bg-green-600 text-white font-semibold py-1 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-200">
-                                Sign In
-                            </button>
-                        </a></li> -->
           </li>
         </ul>
       </nav>
+      
       <div class="md:hidden">
-        <!-- Mobile menu button -->
-        <button
-          class="text-muted-foreground hover:text-primary p-2 rounded focus:outline-none"
-        >
-          <!-- Mobile menu icon (Menu SVG) -->
-          <svg
-            class="h-6 w-6"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16m-7 6h7"
-            />
+        <!-- Mobile menu button with improved styling -->
+        <button class="text-gray-700 hover:text-blue-600 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
           </svg>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Mobile Menu (hidden on larger screens) -->
-  <div class="md:hidden">
-    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-      <a
-        href="#"
-        class="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-primary"
-        >Home</a
-      >
-      <a
-        href="#"
-        class="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-primary"
-        >Services</a
-      >
-      <a
-        href="#"
-        class="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-primary"
-        >About</a
-      >
-      <a
-        href="#"
-        class="block px-3 py-2 text-base font-medium text-muted-foreground hover:text-primary"
-        >Contact</a
-      >
+  <!-- Mobile Menu with improved styling -->
+  <div class="md:hidden hidden">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50 rounded-lg mx-4 my-2 shadow-inner">
+      <a href="{% url 'home' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition duration-200">Home</a>
+      <a href="{% url 'dashboard' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition duration-200">Assessment</a>
+      <a href="{% url 'about' %}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100 transition duration-200">About</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'account_logout' %}" class="block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50 transition duration-200">Sign Out</a>
+      {% else %}
+        <a href="{% url 'account_login' %}" class="block px-3 py-2 rounded-md text-base font-medium text-green-600 hover:bg-green-50 transition duration-200">Sign In</a>
+      {% endif %}
     </div>
   </div>
-  <hr class="border-t-2 text-black" />
 </header>
