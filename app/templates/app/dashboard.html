@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Profile Card -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+            <!-- Profile Header -->
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6">
+                <div class="flex items-center gap-6">
+                    <div class="w-20 h-20 relative">
+                        <img src="{{profile.image.url}}" alt="Profile Picture" 
+                             class="w-full h-full rounded-full border-4 border-white shadow-lg">
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">{{profile.first_name}} {{profile.last_name}}</h1>
+                        <p class="text-emerald-100">{{profile.Blood_Group}} Blood Group</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Details -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="p-2 bg-emerald-100 rounded-lg">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <!-- Calendar Icon -->
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Age</p>
+                            <p class="font-medium">{{profile.age}} years</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="p-2 bg-emerald-100 rounded-lg">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <!-- Scale Icon -->
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Weight</p>
+                            <p class="font-medium">{{profile.weight}} kg</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="p-2 bg-emerald-100 rounded-lg">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <!-- Height Icon -->
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Height</p>
+                            <p class="font-medium">{{profile.height}} cm</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                        <div class="p-2 bg-emerald-100 rounded-lg">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <!-- Heart Icon -->
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">BMI</p>
+                            <p class="font-medium">22.5</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 border-t pt-6">
+                    <a href="" class="flex-1">
+                        <button class="w-full bg-green-500 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-colors border-2">
+                            Take Online Assessment
+                        </button>
+                    </a>
+                    <a href="{% url 'how-to-use' %}" class="flex-1">
+                        <button class="w-full border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 px-6 py-3 rounded-lg font-medium transition-colors">
+                            How to Use
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Previous Results -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div class="bg-gray-50 px-6 py-4 border-b">
+                <h2 class="text-lg font-semibold text-gray-800">Assessment History</h2>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                {% if results %}
+                    {% for result in results %}
+                    <div class="group flex items-center justify-between p-4 bg-white rounded-lg border hover:shadow-md transition-shadow">
+                        <div>
+                            <p class="font-medium text-gray-700">{{ result.date }}</p>
+                            <p class="text-sm text-gray-500">PHQ-9 Score</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-lg font-semibold text-gray-700">{{ result.total_score }}</span>
+                            {% if result.total_score < 9 %}
+                                <span class="px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium">
+                                    {{ result.Status }}
+                                </span>
+                            {% elif result.total_score < 15 %}
+                                <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-sm font-medium">
+                                    {{ result.Status }}
+                                </span>
+                            {% else %}
+                                <span class="px-3 py-1 rounded-full bg-red-100 text-red-800 text-sm font-medium">
+                                    {{ result.Status }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center p-8">
+                        <p class="text-gray-500">No assessment results found</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+
+<style>
+    .bg-gradient-to-r {
+        background-image: linear-gradient(to right, #10b981, #059669);
+    }
+    
+    @media (prefers-reduced-motion: no-preference) {
+        button, a {
+            transition: all 0.2s ease-in-out;
+        }
+    }
+</style>
+{% endblock %}
