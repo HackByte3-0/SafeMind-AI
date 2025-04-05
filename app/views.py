@@ -16,8 +16,7 @@ import os
 from dotenv import load_dotenv
 import google.generativeai as genai
 import logging
-
-
+import requests
 from django.conf import settings
 from django.contrib import messages
 
@@ -142,83 +141,6 @@ def video_feed(request):
                                  content_type='multipart/x-mixed-replace; boundary=frame')
 
 
-
-
-# @login_required
-# def phq9_view(request):
-#     video_camera = VideoCamera()
-#     video_camera.start()
-
-#     # Retrieve or create an EmotionSessionData entry for the current user
-#     session_data, created = EmotionSessionData.objects.get_or_create(user=request.user)
-
-#     print(f"Initial emotion_score: {session_data.emotion_score}")
-#     print(f"Initial emotion_counts: {session_data.emotion_counts}")
-
-#     if request.method == 'POST':
-#         form = PHQ9Form(request.POST)
-#         if form.is_valid():
-#             form_score = sum(int(form.cleaned_data[q]) for q in form.cleaned_data)
-#             total_score = form_score + session_data.emotion_score
-
-#             # Determine depression status based on total score
-#             if total_score >= 20:
-#                 result = "Severe Depression"
-#             elif total_score >= 15:
-#                 result = "Moderately Severe Depression"
-#             elif total_score >= 10:
-#                 result = "Moderate Depression"
-#             elif total_score >= 5:
-#                 result = "Mild Depression"
-#             else:
-#                 result = "Minimal or No Depression"
-
-#             video_camera.stop()
-
-#             # Get the dominant emotion
-#             dominant_emotion = max(session_data.emotion_counts, key=session_data.emotion_counts.get)
-#             recommendation = get_recommendation(form_score, result)
-#             # Save the result and dominant emotion
-#             TestResult.objects.create(
-#                 user=request.user,
-#                 phq9_score=form_score,
-#                 total_score=total_score,
-#                 Status=result,
-#                 emotion_score=session_data.emotion_score,  # Save the overall emotion score
-#                 emotions=session_data.emotion_counts  # Store all detected emotions and their counts
-#             )
-
-#             print(f"Final emotion_score: {session_data.emotion_score}")
-#             # Clear the session data from the database after saving
-#             session_data.delete()
-
-#             return render(request, 'app/result.html', {
-#                 'score': total_score,
-#                 'result': result,
-#                 'emotion_score': session_data.emotion_score,
-#                 'dominant_emotion': dominant_emotion,
-#                 'recommendation': recommendation
-#             })
-#     else:
-#         form = PHQ9Form()
-
-#     # Detect emotions and update session data in the database
-#     dominant_emotion = video_camera.detect_emotions()
-#     if dominant_emotion in ['sad', 'angry', 'disgust', 'fear']:
-#         session_data.emotion_score += 1
-
-#     if dominant_emotion in session_data.emotion_counts:
-#         session_data.emotion_counts[dominant_emotion] += 1
-#     else:
-#         session_data.emotion_counts[dominant_emotion] = 1
-
-#     session_data.save()
-
-#     return render(request, 'app/phq9_form.html', {
-#         'form': form,
-#         'emotion_score': session_data.emotion_score
-#     })
-
 @login_required
 def phq9_view(request):
     # Initialize video camera and emotion detection
@@ -290,7 +212,7 @@ def get_depression_status(score):
         return "Mild Depression"
     return "Minimal or No Depression"
 
-from django.http import JsonResponse
+
 
 def get_current_emotion(request):
     if request.user.is_authenticated:
@@ -385,9 +307,7 @@ def get_recommendation(score, category):
     return "No recommendation available."  # Return a default message if no response is generated
 
 
-from django.shortcuts import redirect
-import requests
-from django.conf import settings
+
 
 
 def audio_phase(request):
@@ -396,135 +316,6 @@ def audio_phase(request):
         return redirect('phq9')
         
     return render(request, 'app/audio_recording.html')
-
-
-# @login_required
-# def analyze_audio(request):
-#     if request.method == 'POST' and request.FILES.get('audio'):
-#         try:
-#             # [1] Verify session data exists
-#             if 'phq9_data' not in request.session:
-#                 return redirect('phq9_view')
-
-#             # [2] Validate audio file
-#             audio_file = request.FILES['audio']
-#             if audio_file.size > 10*1024*1024:  # 10MB limit
-#                 raise ValueError("Audio file too large (max 10MB)")
-            
-#             # [3] Process audio
-#             analysis = analyze_with_cloudflare(audio_file)
-#             if not analysis:
-#                 raise ValueError("Failed to analyze audio")
-
-#             # [4] Create test result
-#             result = TestResult.objects.create(
-#                 user=request.user,
-#                 phq9_score=request.session['phq9_data']['form_score'],
-#                 total_score=request.session['phq9_data']['total_score'],
-#                 Status=request.session['phq9_data']['result'],
-#                 emotions=request.session['phq9_data']['emotion_counts'],
-#                 emotion_score=request.session['phq9_data']['emotion_score'],
-#                 audio_sentiment=analysis.get('sentiment', {}),
-#                 audio_duration=analysis.get('duration', 0)
-#             )
-
-#             # [5] Clear session AFTER successful creation
-#             del request.session['phq9_data']
-            
-#             # [6] Explicit redirect with valid URL
-#             return redirect('final_results', result_id=result.id)
-
-#         except Exception as e:
-#             logger.error(f"Audio analysis error: {str(e)}")
-#             return render(request, 'app/error.html', {
-#                 'error': f"Processing failed: {str(e)}"
-#             })
-    
-#     # [7] Handle non-POST/no-file properly
-#     return redirect('audio_phase')
-
-
-
-
-# Initialize speech recognizer
- # Adjust as needed
-
-# def analyze_with_custom_model(audio_file):
-#     """
-#     Process audio through speech-to-text and custom model analysis
-#     Returns depression score and analysis metadata
-#     """
-#     try:
-#         # 1. Convert audio to text
-#         text = convert_speech_to_text(audio_file)
-        
-#         # 2. Send text to custom model endpoint
-#         return analyze_text_with_model(text)
-        
-#     except Exception as e:
-#         logger.error(f"Audio analysis failed: {str(e)}")
-#         return {'error': str(e)}
-
-# def convert_speech_to_text(audio_file):
-#     """Convert uploaded audio file to text using speech recognition"""
-#     try:
-#         # Save temporary audio file
-#         temp_path = os.path.join(settings.MEDIA_ROOT, 'temp_audio.wav')
-#         with open(temp_path, 'wb+') as destination:
-#             for chunk in audio_file.chunks():
-#                 destination.write(chunk)
-        
-#         # Process with speech recognition
-#         with sr.AudioFile(temp_path) as source:
-#             audio_data = recognizer.record(source)
-#             text = recognizer.recognize_google(audio_data)
-            
-#         os.remove(temp_path)  # Cleanup
-#         return text
-        
-#     except sr.UnknownValueError:
-#         raise ValueError("Could not understand audio")
-#     except sr.RequestError as e:
-#         raise ConnectionError(f"Speech recognition service error: {e}")
-
-# def convert_speech_to_text(audio_file):
-#     """Convert uploaded audio file to text using speech recognition"""
-#     try:
-#         # Save temporary audio file with a unique name
-#         import uuid
-#         temp_filename = f'temp_audio_{uuid.uuid4()}.wav'
-#         temp_path = os.path.join(settings.MEDIA_ROOT, temp_filename)
-        
-#         # Ensure the directory exists
-#         os.makedirs(os.path.dirname(temp_path), exist_ok=True)
-        
-#         with open(temp_path, 'wb+') as destination:
-#             for chunk in audio_file.chunks():
-#                 destination.write(chunk)
-        
-#         # Process with speech recognition
-#         with sr.AudioFile(temp_path) as source:
-#             # Adjust for ambient noise
-#             recognizer.adjust_for_ambient_noise(source)
-#             audio_data = recognizer.record(source)
-#             text = recognizer.recognize_google(audio_data)
-            
-#         # Clean up after processing
-#         if os.path.exists(temp_path):
-#             os.remove(temp_path)
-            
-#         return text
-        
-#     except sr.UnknownValueError:
-#         logger.error("Could not understand audio")
-#         raise ValueError("Could not understand audio")
-#     except sr.RequestError as e:
-#         logger.error(f"Speech recognition service error: {e}")
-#         raise ConnectionError(f"Speech recognition service error: {e}")
-#     except Exception as e:
-#         logger.error(f"Unexpected error in speech conversion: {str(e)}")
-#         raise ValueError(f"Audio processing error: {str(e)}")
-
 
 
 
@@ -756,17 +547,7 @@ def calculate_composite_score(result):
         logger.error(f"Error calculating composite score: {str(e)}")
         return 0  # Return default score if calculation fails
 
-# def analyze_with_cloudflare(audio_file):
-#     account_id = os.getenv('CLOUDFLARE_ACCOUNT_ID')
-#     api_token = os.getenv('CLOUDFLARE_API_TOKEN')
-    
-#     response = requests.post(
-#         f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/@cf/huggingface/speech-separation/wav2vec2-lv60",
-#         headers={"Authorization": f"Bearer {api_token}"},
-#         files={"audio": audio_file}
-#     )
-    
-#     return response.json().get('result', {})
+
 
 
 @login_required
@@ -857,17 +638,7 @@ def final_results(request, result_id):
         }, status=500)
         
         
-# def calculate_composite_score(result):
-#     # Custom scoring logic
-#     emotion_weight = 0.2
-#     audio_weight = 0.3
-#     phq9_weight = 0.5
-    
-#     return (
-#         (result.phq9_score * phq9_weight) +
-#         (result.emotion_score * emotion_weight) +
-#         (result.audio_sentiment.get('confidence', 0) * audio_weight)
-#     )
+
 
 def analyze_journal_text(text):
     """Analyze text using Cloudflare's sentiment model"""
