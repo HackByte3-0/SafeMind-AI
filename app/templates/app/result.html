@@ -31,6 +31,17 @@
                 </div>
             </div>
 
+            {% if has_audio_data %}
+            <div class="audio-results">
+                <p>Processed Text: {{ audio_data.processed_text|default:"Not available" }}</p>
+                <p>Sentiment Score: {{ audio_data.depression_score|default:"Not calculated" }}</p>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">
+                Audio analysis data not available for this test
+            </div>
+            {% endif %}
+
             <!-- Recommendation Section -->
             <div class="space-y-6">
                 <div class="border-t border-b border-gray-200 py-6">

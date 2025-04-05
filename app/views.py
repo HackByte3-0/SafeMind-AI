@@ -509,7 +509,7 @@ def audio_phase(request):
 #         logger.error(f"Unexpected error in speech conversion: {str(e)}")
 #         raise ValueError(f"Audio processing error: {str(e)}")
 
-API_KEY = os.getenv("CLOUDFLARE_API_KEY") 
+API_KEY = os.getenv("CLOUDFLARE_API_TOKEN") 
 ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID") 
 MODEL = "@cf/huggingface/distilbert-sst-2-int8"
 
@@ -609,15 +609,24 @@ def analyze_audio(request):
     return redirect('audio_phase')
 
 def calculate_composite_score(result):
-    """Updated scoring with audio depression score"""
+    """Calculate weighted composite score with safe defaults"""
+    # Default weights
     emotion_weight = 0.2
     audio_weight = 0.3
     phq9_weight = 0.5
     
+    # Safe defaults if data is missing
+    audio_score = 0
+    if result.audio_analysis:  # Check if analysis exists
+        audio_score = result.audio_analysis.get('depression_score', 0)
+    
+    emotion_score = getattr(result, 'emotion_score', 0)
+    phq9_score = getattr(result, 'phq9_score', 0)
+    
     return (
-        (result.phq9_score * phq9_weight) +
-        (result.emotion_score * emotion_weight) +
-        (result.audio_analysis['depression_score'] * audio_weight)
+        (phq9_score * phq9_weight) +
+        (emotion_score * emotion_weight) +
+        (audio_score * audio_weight)
     )
 
 # def analyze_with_cloudflare(audio_file):
@@ -637,13 +646,14 @@ def calculate_composite_score(result):
 def final_results(request, result_id):
     result = get_object_or_404(TestResult, id=result_id, user=request.user)
     
-    # Calculate composite score
-    composite_score = calculate_composite_score(result)
+    # Safely get audio analysis data
+    audio_data = result.audio_analysis or {}
     
     return render(request, 'app/final_result.html', {
         'result': result,
-        'composite_score': composite_score,
-        'audio_sentiment': result.audio_sentiment
+        'composite_score': calculate_composite_score(result),
+        'audio_sentiment': audio_data.get('sentiment', {}),
+        'processed_text': audio_data.get('processed_text', 'No transcription available')
     })
 
 def calculate_composite_score(result):

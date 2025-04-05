@@ -18,6 +18,7 @@ class TestResult(models.Model):
     emotion_score = models.IntegerField(null=True, blank=True)
     audio_sentiment = models.JSONField(null=True, blank=True)  # New field
     audio_duration = models.FloatField(null=True, blank=True)  # New field
+    audio_analysis = models.JSONField(default=dict)
     date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     
     def __str__(self):
