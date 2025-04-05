@@ -2,24 +2,40 @@
 
 {% block content %}
 <div class="flex justify-center items-center min-h-screen bg-gray-100">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
-        <h1 class="text-2xl font-bold mb-6 text-center">PHQ-9 Depression Assessment</h1>
+    <div class="bg-white p-8 rounded-xl shadow-xl w-full max-w-2xl mx-4">
+        <h1 class="text-3xl font-bold mb-6 text-center text-gray-800">PHQ-9 Depression Assessment</h1>
 
-        <div class="mb-6">
-            <h2 class="text-lg font-semibold text-center">Facial Emotion Detection</h2>
-            <img id="video" src="{% url 'video_feed' %}" class="rounded-lg shadow-lg w-full h-64 object-cover" alt="Video Feed">
-        </div>
+      <!-- Video Feed Section -->
+<div class="mb-8 border-4 border-blue-50 rounded-xl overflow-hidden">
+    <div class="bg-blue-50 p-3">
+        <h2 class="text-lg font-semibold text-center text-blue-600">Live Facial Emotion Detection</h2>
+    </div>
+    <img id="video" src="{% url 'video_feed' %}" class="w-full h-[480px] object-cover rounded-lg" alt="Video Feed">
+</div>
 
-        <form method="POST" class="space-y-6">
+        <form method="POST" class="space-y-8">
             {% csrf_token %}
-            <!-- Display each question with spacing -->
-            <div class="space-y-4">
-                {{ form.as_p }}
+            
+            <div class="space-y-6">
+                {% for field in form %}
+                <div class="question-group p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <label class="block text-lg font-medium text-gray-700 mb-3">{{ field.label }}</label>
+                    
+                    <div class="space-y-2">
+                        {% for choice in field %}
+                        <label class="flex items-center space-x-3 p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors duration-200">
+                            {{ choice.tag }}
+                            <span class="text-gray-700">{{ choice.choice_label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="w-full bg-blue-500 text-white font-semibold py-2 mt-4 rounded hover:bg-blue-600 transition duration-300 ease-in-out">
-                Submit
+            <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-[1.02] shadow-md">
+                Submit Assessment
             </button>
         </form>
     </div>
