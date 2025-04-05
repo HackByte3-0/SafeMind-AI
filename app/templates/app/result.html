@@ -23,25 +23,15 @@
                 </div>
 
                 <!-- Results Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <div class="flex items-center justify-center space-x-2 mb-2">
-                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg>
-                            <span class="text-lg font-semibold text-gray-700">Current Mood</span>
-                        </div>
-                        <p class="text-xl font-medium text-gray-900">{{ dominant_emotion }}</p>
-                    </div>
-
-                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div class="grid grid-cols-1">
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mx-auto max-w-md w-full">
                         <div class="flex items-center justify-center space-x-2 mb-2">
                             <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             <span class="text-lg font-semibold text-gray-700">Assessment Status</span>
                         </div>
-                        <p class="text-xl font-medium text-red-600">{{ result }}</p>
+                        <p class="text-xl font-medium text-red-600 text-center">{{ result }}</p>
                     </div>
                 </div>
             </div>
@@ -72,7 +62,7 @@
                                 </p>
                             </div>
                         {% elif score >= 10 and score <= 14 %}
-                            <div class="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                            <div class="p-4  rounded-lg border border-orange-200">
                                 <p class="text-orange-700 font-medium">
                                     <span class="font-semibold">Recommendation:</span> 
                                     Moderate depression - Recommend therapeutic intervention and follow-up assessment.

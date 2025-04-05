@@ -38,9 +38,14 @@ def dashboard(request):
     profile = Profile.objects.get(email=request.user.email)
     results = TestResult.objects.filter(user=request.user).order_by('-date')
 
+    height_m = profile.height / 100
+
+    # Calculate BMI
+    bmi = profile.weight / (height_m ** 2)
     context = {
         'profile': profile,
         'results': results,
+        'bmi': bmi,
     }
 
     return render(request, "app/dashboard.html",context)
