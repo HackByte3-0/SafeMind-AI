@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <div class="max-w-2xl mx-auto pt-8 px-4">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Chat Header -->
+            <div class="bg-blue-600 p-4">
+                <div class="flex items-center">
+                    <div class="bg-white p-2 rounded-full">
+                        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h2 class="text-white text-xl font-semibold">Mental Health Companion - MindBloom</h2>
+                        <p class="text-blue-200 text-sm">I'm here to listen and support you</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="h-96 overflow-y-auto p-4 space-y-4" id="chat-messages">
+                {% if initial_greeting %}
+<div class="chat-message bot-message">
+  <div class="message-bubble">
+    {{ initial_greeting.message }}
+  </div>
+  <div class="message-timestamp">
+    {{ initial_greeting.timestamp|time }}
+  </div>
+</div>
+{% endif %}
+                {% for chat in history %}
+                <div class="flex flex-col space-y-2">
+                    <div class="self-end bg-blue-100 rounded-lg p-3 max-w-xs lg:max-w-md">
+                        <p class="text-gray-800">{{ chat.message }}</p>
+                    </div>
+                    <div class="self-start bg-gray-100 rounded-lg p-3 max-w-xs lg:max-w-md">
+                        <p class="text-gray-800">{{ chat.response }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Chat Input -->
+            <div class="border-t p-4 bg-gray-50">
+                <form id="chat-form" class="flex gap-2">
+                    <input type="text" name="message" 
+                           class="flex-1 rounded-full px-6 py-3 border focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Type your message here..." required>
+                    <button type="submit" 
+                            class="bg-blue-600 text-white rounded-full px-6 py-3 hover:bg-blue-700 transition-colors">
+                        Send
+                    </button>
+                </form>
+                <p class="text-sm text-gray-500 mt-2 text-center">
+                    This is an AI companion - not a substitute for professional help
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('chat-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const input = form.message;
+    const messagesDiv = document.getElementById('chat-messages');
+    
+    // Add user message
+    messagesDiv.innerHTML += `
+        <div class="flex flex-col space-y-2">
+            <div class="self-end bg-blue-100 rounded-lg p-3 max-w-xs lg:max-w-md">
+                <p class="text-gray-800">${input.value}</p>
+            </div>
+            <div class="self-start bg-gray-100 rounded-lg p-3 max-w-xs lg:max-w-md">
+                <div class="typing-indicator flex space-x-1">
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                    <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                </div>
+            </div>
+        </div>`;
+    
+    // Scroll to bottom
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    
+    try {
+        const response = await fetch('/chat/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: new URLSearchParams({
+                message: input.value
+            })
+        });
+        
+        const data = await response.json();
+        
+        // Update last message with response
+        const lastBotMessage = messagesDiv.lastElementChild.querySelector('.bg-gray-100');
+        lastBotMessage.innerHTML = `<p class="text-gray-800">${data.response}</p>`;
+        
+    } catch (error) {
+        console.error('Error:', error);
+        const lastBotMessage = messagesDiv.lastElementChild.querySelector('.bg-gray-100');
+        lastBotMessage.innerHTML = `<p class="text-red-500">Sorry, I'm having trouble responding right now.</p>`;
+    }
+    
+    input.value = '';
+});
+</script>
+{% endblock %}

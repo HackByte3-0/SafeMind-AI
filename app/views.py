@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect 
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from accounts.models import Profile
-from app.models import TestResult,EmotionSessionData
+from app.models import TestResult,EmotionSessionData,ChatHistory
 from collections import Counter
 from app.forms import *
 import cv2
@@ -10,8 +11,14 @@ from django.http import StreamingHttpResponse
 import os
 from dotenv import load_dotenv
 import google.generativeai as genai
+import logging
+
+# Configure logger
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.ERROR)
 
 load_dotenv()
+
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 # Create your views here.
 
@@ -187,6 +194,75 @@ def phq9_view(request):
         'emotion_score': session_data.emotion_score
     })
 
+@login_required
+def chatbot_view(request):
+    """Render the chat interface with history"""
+    history = ChatHistory.objects.filter(user=request.user).order_by('-timestamp')[:10]
+    
+    # Add initial greeting if no history exists
+    if not history.exists():
+        initial_greeting = {
+            'is_bot': True,
+            'message': "🌼 Hi! I'm Mindbloom, your mental wellness companion. "
+                      "I'm here to listen without judgment. How are you feeling today?",
+        
+        }
+    else:
+        initial_greeting = None
+    
+    return render(request, 'app/chatbot.html', {
+        'history': history,
+        'initial_greeting': initial_greeting
+    })
+
+@login_required
+def chat(request):
+    if request.method == 'POST':
+        user_message = request.POST.get('message').strip()
+        
+        # Handle empty messages
+        if not user_message:
+            return JsonResponse({'response': "🌱 I'm here to listen. Please share what's on your mind."})
+
+        # Enhanced prompt with conversation context
+        prompt = f"""**You are Mindbloom** - a compassionate mental health companion. 
+        **User says:** "{user_message}"
+
+        **Response Rules:**
+        1. Start with emotional validation
+        2. Use plant/nature metaphors when possible 🌿
+        3. Suggest one simple coping strategy
+        4. Keep responses 2-3 sentences max
+        5. Never diagnose - encourage professional help if needed
+        6. Use warm, conversational tone with occasional emojis
+
+        **Example Good Response:**
+        "That sounds really tough, but I admire your strength in sharing this. 🌱 Sometimes our minds need stormy days to grow stronger. Would taking 3 deep breaths help right now?"
+
+        **Now Craft Your Response:**"""
+        
+        try:
+            # Generate response
+            model = genai.GenerativeModel("gemini-1.5-flash-latest")
+            response = model.generate_content(prompt)
+            chat_response = response.text.strip().replace('**', '')  # Remove markdown
+            
+            # Save to history
+            ChatHistory.objects.create(
+                user=request.user,
+                message=user_message,
+                response=chat_response
+            )
+            
+            return JsonResponse({'response': chat_response})
+        
+        except Exception as e:
+            logger.error(f"Chat error: {str(e)}")
+            return JsonResponse({
+                'response': "🌧️ Hmm, my petals are feeling a bit droopy. Could you try rephrasing that?"
+            }, status=500)
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def get_recommendation(score, category):
     prompt = f"Based on a PHQ-9 depression score of {score}, categorized as {category}, provide a brief 3-4 line recommendation for mental health care, focusing on self-care and professional advice."
