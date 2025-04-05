@@ -9,7 +9,8 @@ class ProfileForm(forms.ModelForm):
             'first_name', 
             'last_name', 
             'image', 
-            'email', 
+            'email',
+            'age', 
             'date_of_birth', 
             'height', 
             'weight'
