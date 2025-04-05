@@ -45,3 +45,16 @@ class ChatHistory(models.Model):
     message = models.TextField()
     response = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    
+    
+
+
+class JournalEntry(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    entry_date = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+    positive_score = models.FloatField(default=0)
+    negative_score = models.FloatField(default=0)
+
+    class Meta:
+        ordering = ['-entry_date']

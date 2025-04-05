@@ -2,6 +2,7 @@ import json
 import traceback
 from django.shortcuts import render, redirect ,get_object_or_404
 from django.http import Http404, JsonResponse
+from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import login_required
 from accounts.models import Profile
 from app.models import TestResult,EmotionSessionData,ChatHistory
@@ -18,6 +19,7 @@ import logging
 
 
 from django.conf import settings
+from django.contrib import messages
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -43,6 +45,17 @@ def contact(request):
 def dashboard(request):
     profile = Profile.objects.get(email=request.user.email)
     results = TestResult.objects.filter(user=request.user).order_by('-date')
+    
+    entries = JournalEntry.objects.filter(user=request.user).order_by('entry_date')
+    
+    chart_data = {
+        'dates': [e.entry_date.strftime("%Y-%m-%d") for e in entries],
+        'positive': [e.positive_score for e in entries],
+        'negative': [e.negative_score for e in entries]
+    }
+    
+    chart_data_json = mark_safe(json.dumps(chart_data))
+    
 
     height_m = profile.height / 100
 
@@ -52,6 +65,7 @@ def dashboard(request):
         'profile': profile,
         'results': results,
         'bmi': bmi,
+        'chart_data_json': chart_data_json
     }
 
     return render(request, "app/dashboard.html",context)
@@ -854,3 +868,67 @@ def final_results(request, result_id):
 #         (result.emotion_score * emotion_weight) +
 #         (result.audio_sentiment.get('confidence', 0) * audio_weight)
 #     )
+
+def analyze_journal_text(text):
+    """Analyze text using Cloudflare's sentiment model"""
+    API_KEY = os.getenv("CLOUDFLARE_API_TOKEN")
+    ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
+    MODEL = "@cf/huggingface/distilbert-sst-2-int8"
+    
+    if not API_KEY or not ACCOUNT_ID:
+        logger.error("Missing Cloudflare API credentials")
+        return {'error': 'API configuration missing'}
+
+    try:
+        response = requests.post(
+            f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/{MODEL}",
+            headers={"Authorization": f"Bearer {API_KEY}"},
+            json={"text": text},
+            timeout=10
+        )
+        
+        if response.status_code != 200:
+            return {'error': f'API error: {response.status_code}'}
+
+        result = response.json().get('result', [])
+        scores = {
+            'positive': 0.0,
+            'negative': 0.0
+        }
+
+        for item in result:
+            if item['label'] == 'POSITIVE':
+                scores['positive'] = float(item['score'])
+            elif item['label'] == 'NEGATIVE':
+                scores['negative'] = float(item['score'])
+
+        return scores
+
+    except Exception as e:
+        logger.error(f"Analysis failed: {str(e)}")
+        return {'error': str(e)}
+
+def journal(request):
+    if request.method == 'POST':
+        form = JournalForm(request.POST)
+        if form.is_valid():
+            entry = form.save(commit=False)
+            entry.user = request.user
+            
+            # Perform sentiment analysis
+            analysis = analyze_journal_text(entry.content)
+            
+            if 'error' not in analysis:
+                entry.positive_score = analysis.get('positive', 0)
+                entry.negative_score = analysis.get('negative', 0)
+                entry.save()
+                return redirect('journal')
+            else:
+                # Handle analysis error
+                messages.error(request, f"Analysis failed: {analysis['error']}")
+
+    entries = JournalEntry.objects.filter(user=request.user).order_by('-entry_date')
+    return render(request, 'app/journal.html', {
+        'form': JournalForm(),
+        'entries': entries
+    })
