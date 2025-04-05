@@ -4,4 +4,5 @@ opencv
 pillow
 django-jsonfield
 distutils==1.26.3
-SpeechRecognition>=3.8.1
+pocketsphinx==5.0.4
+PyAudio==0.2.14
