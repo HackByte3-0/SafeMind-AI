@@ -13,7 +13,7 @@ import os
 from dotenv import load_dotenv
 import google.generativeai as genai
 import logging
-import speech_recognition as sr
+
 
 from django.conf import settings
 
@@ -431,46 +431,83 @@ def audio_phase(request):
 
 
 # Initialize speech recognizer
-recognizer = sr.Recognizer()
-recognizer.pause_threshold = 1.0  # Adjust as needed
+ # Adjust as needed
 
-def analyze_with_custom_model(audio_file):
-    """
-    Process audio through speech-to-text and custom model analysis
-    Returns depression score and analysis metadata
-    """
-    try:
-        # 1. Convert audio to text
-        text = convert_speech_to_text(audio_file)
+# def analyze_with_custom_model(audio_file):
+#     """
+#     Process audio through speech-to-text and custom model analysis
+#     Returns depression score and analysis metadata
+#     """
+#     try:
+#         # 1. Convert audio to text
+#         text = convert_speech_to_text(audio_file)
         
-        # 2. Send text to custom model endpoint
-        return analyze_text_with_model(text)
+#         # 2. Send text to custom model endpoint
+#         return analyze_text_with_model(text)
         
-    except Exception as e:
-        logger.error(f"Audio analysis failed: {str(e)}")
-        return {'error': str(e)}
+#     except Exception as e:
+#         logger.error(f"Audio analysis failed: {str(e)}")
+#         return {'error': str(e)}
 
-def convert_speech_to_text(audio_file):
-    """Convert uploaded audio file to text using speech recognition"""
-    try:
-        # Save temporary audio file
-        temp_path = os.path.join(settings.MEDIA_ROOT, 'temp_audio.wav')
-        with open(temp_path, 'wb+') as destination:
-            for chunk in audio_file.chunks():
-                destination.write(chunk)
+# def convert_speech_to_text(audio_file):
+#     """Convert uploaded audio file to text using speech recognition"""
+#     try:
+#         # Save temporary audio file
+#         temp_path = os.path.join(settings.MEDIA_ROOT, 'temp_audio.wav')
+#         with open(temp_path, 'wb+') as destination:
+#             for chunk in audio_file.chunks():
+#                 destination.write(chunk)
         
-        # Process with speech recognition
-        with sr.AudioFile(temp_path) as source:
-            audio_data = recognizer.record(source)
-            text = recognizer.recognize_google(audio_data)
+#         # Process with speech recognition
+#         with sr.AudioFile(temp_path) as source:
+#             audio_data = recognizer.record(source)
+#             text = recognizer.recognize_google(audio_data)
             
-        os.remove(temp_path)  # Cleanup
-        return text
+#         os.remove(temp_path)  # Cleanup
+#         return text
         
-    except sr.UnknownValueError:
-        raise ValueError("Could not understand audio")
-    except sr.RequestError as e:
-        raise ConnectionError(f"Speech recognition service error: {e}")
+#     except sr.UnknownValueError:
+#         raise ValueError("Could not understand audio")
+#     except sr.RequestError as e:
+#         raise ConnectionError(f"Speech recognition service error: {e}")
+
+# def convert_speech_to_text(audio_file):
+#     """Convert uploaded audio file to text using speech recognition"""
+#     try:
+#         # Save temporary audio file with a unique name
+#         import uuid
+#         temp_filename = f'temp_audio_{uuid.uuid4()}.wav'
+#         temp_path = os.path.join(settings.MEDIA_ROOT, temp_filename)
+        
+#         # Ensure the directory exists
+#         os.makedirs(os.path.dirname(temp_path), exist_ok=True)
+        
+#         with open(temp_path, 'wb+') as destination:
+#             for chunk in audio_file.chunks():
+#                 destination.write(chunk)
+        
+#         # Process with speech recognition
+#         with sr.AudioFile(temp_path) as source:
+#             # Adjust for ambient noise
+#             recognizer.adjust_for_ambient_noise(source)
+#             audio_data = recognizer.record(source)
+#             text = recognizer.recognize_google(audio_data)
+            
+#         # Clean up after processing
+#         if os.path.exists(temp_path):
+#             os.remove(temp_path)
+            
+#         return text
+        
+#     except sr.UnknownValueError:
+#         logger.error("Could not understand audio")
+#         raise ValueError("Could not understand audio")
+#     except sr.RequestError as e:
+#         logger.error(f"Speech recognition service error: {e}")
+#         raise ConnectionError(f"Speech recognition service error: {e}")
+#     except Exception as e:
+#         logger.error(f"Unexpected error in speech conversion: {str(e)}")
+#         raise ValueError(f"Audio processing error: {str(e)}")
 
 API_KEY = os.getenv("CLOUDFLARE_API_KEY") 
 ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID") 
@@ -479,16 +516,8 @@ MODEL = "@cf/huggingface/distilbert-sst-2-int8"
 def analyze_text_with_model(text):
     """Send text to custom model endpoint and apply depression scoring logic"""
     try:
-        # 1. Send to your custom model endpoint
-        # response = requests.post(
-        #     settings.CUSTOM_MODEL_ENDPOINT,
-        #     headers={"Authorization": f"Bearer {settings.CUSTOM_MODEL_API_KEY}"},
-        #     json={"text": text},
-        #     timeout=10
-        # )
-        
         API_BASE_URL = f"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID}/ai/run/"
-        headers = {"Authorization": f"Bearer { API_KEY}"}
+        headers = {"Authorization": f"Bearer {API_KEY}"}
         response = requests.post(f"{API_BASE_URL}{MODEL}", headers=headers, json={"text": text})
 
         if response.status_code != 200:
@@ -496,9 +525,9 @@ def analyze_text_with_model(text):
             
         model_result = response.json()
         
-        # 2. Apply your original depression scoring logic
+        # Apply your depression scoring logic
         if "result" in model_result and isinstance(model_result["result"], list):
-            # Extract negative sentiment score (same as original)
+            # Extract negative sentiment score
             negative_score = 0
             for item in model_result["result"]:
                 if item["label"] == "NEGATIVE":
@@ -511,7 +540,7 @@ def analyze_text_with_model(text):
             depression_score = round(adjusted_score * 35)
             depression_score = min(depression_score, 25)
             
-            # Apply keyword boosting (from original)
+            # Apply keyword boosting
             lower_text = text.lower()
             depression_keywords = ["sad", "depressed", "hopeless", "worthless", 
                                  "suffer", "can't feel", "pain", "tired", 
@@ -522,9 +551,9 @@ def analyze_text_with_model(text):
             
             return {
                 'depression_score': depression_score,
-                'confidence': negative_score,  # Use raw negative score as confidence
+                'confidence': negative_score,
                 'processed_text': text,
-                'raw_result': model_result  # Store full model output
+                'raw_result': model_result
             }
             
         raise ValueError("Unexpected model response format")
@@ -535,37 +564,35 @@ def analyze_text_with_model(text):
 
 @login_required
 def analyze_audio(request):
-    if request.method == 'POST' and request.FILES.get('audio'):
+    if request.method == 'POST':
         try:
             # Validate session
             if 'phq9_data' not in request.session:
+                logger.warning("No PHQ9 data in session")
                 return redirect('phq9_view')
-
-            # Validate audio file
-            audio_file = request.FILES['audio']
-            if audio_file.size > 10*1024*1024:  # 10MB limit
-                raise ValueError("Audio file too large (max 10MB)")
             
-            # Process audio through custom model
-            analysis = analyze_with_custom_model(audio_file)
+            # Get transcription from form
+            transcription = request.POST.get('transcription', '').strip()
+            if not transcription:
+                raise ValueError("No transcription received")
             
-            if 'error' in analysis:
-                raise ValueError(analysis['error'])
+            # Analyze the transcribed text
+            analysis = analyze_text_with_model(transcription)
             
             # Create test result
             result = TestResult.objects.create(
                 user=request.user,
                 phq9_score=request.session['phq9_data']['form_score'],
                 total_score=request.session['phq9_data']['total_score'],
-                Status=request.session['phq9_data']['result'],
+                Status=request.session['phq9_data']['depression_status'],
                 emotions=request.session['phq9_data']['emotion_counts'],
                 emotion_score=request.session['phq9_data']['emotion_score'],
                 audio_analysis={
-                    'depression_score': analysis['depression_score'],
-                    'processed_text': analysis['processed_text'],
-                    'confidence': analysis['confidence']
+                    'depression_score': analysis.get('depression_score', 0),
+                    'processed_text': analysis.get('processed_text', ''),
+                    'confidence': analysis.get('confidence', 0)
                 },
-                audio_duration=20  # Fixed 20-second recordings
+                audio_duration=20  # Fixed duration since we're recording for 20s
             )
 
             # Clear session data
