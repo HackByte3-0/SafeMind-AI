@@ -6,3 +6,4 @@ django-jsonfield
 distutils==1.26.3
 pocketsphinx==5.0.4
 PyAudio==0.2.14
+django-widget-tweaks

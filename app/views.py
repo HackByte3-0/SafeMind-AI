@@ -42,7 +42,7 @@ def contact(request):
 
 @login_required
 def dashboard(request):
-    profile = Profile.objects.get(email=request.user.email)
+    profile = get_object_or_404(Profile,user=request.user)
     results = TestResult.objects.filter(user=request.user).order_by('-date')
     
     entries = JournalEntry.objects.filter(user=request.user).order_by('entry_date')
