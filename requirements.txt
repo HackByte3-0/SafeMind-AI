@@ -2,3 +2,5 @@ django
 django-allauth
 opencv
 pillow
+django-jsonfield
+distutils==1.26.3

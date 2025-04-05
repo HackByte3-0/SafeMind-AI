@@ -1,6 +1,6 @@
 from django.db import models
 import uuid
-
+from django.contrib.auth.models import User
 # Create your models here.
 
 
@@ -35,3 +35,13 @@ class EmotionSessionData(models.Model):
 
     def __str__(self):
         return f"Emotion data for {self.user}"
+
+
+
+
+
+class ChatHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    response = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)

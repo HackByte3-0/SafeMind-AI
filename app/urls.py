@@ -11,5 +11,7 @@ urlpatterns = [
     path('book-consultation/',book_consultation,name='book_consultation'),
     path('video_feed/', video_feed, name='video_feed'),
     path("assesment/", phq9_view, name="phq9"),
+    path('chatbot/', chatbot_view, name='chatbot'),
+    path('chat/', chat, name='chat_api'),
     
 ]

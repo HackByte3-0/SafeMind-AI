@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect 
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from accounts.models import Profile
-from app.models import TestResult,EmotionSessionData
+from app.models import TestResult,EmotionSessionData,ChatHistory
 from collections import Counter
 from app.forms import *
 import cv2
@@ -12,6 +13,7 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 
 load_dotenv()
+
 genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
 # Create your views here.
 
@@ -187,6 +189,44 @@ def phq9_view(request):
         'emotion_score': session_data.emotion_score
     })
 
+@login_required
+def chat(request):
+    if request.method == 'POST':
+        user_message = request.POST.get('message')
+        
+        # Generate response with mental health focus
+        prompt = f"""
+You are a compassionate mental health companion. The user says: "{user_message}".
+Respond following these rules:
+1. Validate their feelings first
+2. Use empathetic language
+3. Keep responses under 3 sentences
+4. Offer gentle suggestions when appropriate
+5. Never diagnose conditions
+6. Recommend professional help if needed
+7. Use simple, conversational language
+8. Add comforting emojis occasionally
+"""
+        model = genai.GenerativeModel("gemini-2.0-flash")
+        response = model.generate_content(prompt)
+        chat_response = response.text
+        
+        # Save to history
+        ChatHistory.objects.create(
+            user=request.user,
+            message=user_message,
+            response=chat_response
+        )
+        
+        return JsonResponse({'response': chat_response})
+    
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@login_required
+def chatbot_view(request):
+    """Render the chat interface with history"""
+    history = ChatHistory.objects.filter(user=request.user).order_by('-timestamp')[:10]
+    return render(request, 'app/chatbot.html', {'history': history})
 
 def get_recommendation(score, category):
     prompt = f"Based on a PHQ-9 depression score of {score}, categorized as {category}, provide a brief 3-4 line recommendation for mental health care, focusing on self-care and professional advice."
