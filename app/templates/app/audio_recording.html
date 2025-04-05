@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto my-8 p-6 bg-white rounded-xl shadow-md">
+    <h2 class="text-2xl font-semibold mb-4">Voice Analysis Phase</h2>
+    <div class="mb-4 text-gray-600">
+        Please speak naturally for at least 20 seconds about your day or feelings
+    </div>
+    
+    <div id="recording-ui" class="space-y-4">
+        <div id="timer" class="text-center text-2xl font-bold">00:20</div>
+        
+        <button id="startBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            Start Recording
+        </button>
+        
+        <div id="audioPreview" class="hidden"></div>
+        
+        <form id="uploadForm" class="hidden" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="audio" id="audioInput" accept="audio/wav">
+            <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+                Submit Recording
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+let mediaRecorder, timerInterval;
+const timerDisplay = document.getElementById('timer');
+
+document.getElementById('startBtn').addEventListener('click', async () => {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        let chunks = [];
+        let timeLeft = 20;
+
+        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+        
+        mediaRecorder.onstop = async () => {
+            const blob = new Blob(chunks, { type: 'audio/wav' });
+            const file = new File([blob], 'recording.wav', { type: 'audio/wav' });
+            
+            // Show preview and upload form
+            document.getElementById('uploadForm').classList.remove('hidden');
+            document.getElementById('startBtn').disabled = true;
+            
+            // Create file input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            document.getElementById('audioInput').files = dataTransfer.files;
+        };
+
+        // Start recording
+        mediaRecorder.start();
+        
+        // Start countdown
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = `00:${timeLeft.toString().padStart(2, '0')}`;
+            
+            if(timeLeft <= 0) {
+                clearInterval(timerInterval);
+                mediaRecorder.stop();
+            }
+        }, 1000);
+
+    } catch (err) {
+        console.error('Error accessing microphone:', err);
+        alert('Microphone access required for this assessment');
+    }
+});
+</script>
+{% endblock %}
