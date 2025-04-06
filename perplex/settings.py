@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'app',
     'allauth',
     'allauth.account',
+    'widget_tweaks',
     
     'accounts.apps.AccountsConfig'
     
@@ -160,3 +161,8 @@ LOGOUT_REDIRECT_URL = '/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# settings.py
+CUSTOM_MODEL_ENDPOINT = "https://your-model-api.com/analyze"
+CUSTOM_MODEL_API_KEY = "your-api-key-here"
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

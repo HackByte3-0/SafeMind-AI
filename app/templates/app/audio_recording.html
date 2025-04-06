@@ -1,0 +1,95 @@
+{% extends 'base.html' %}  
+{% block content %} 
+<div class="max-w-md mx-auto my-8 p-6 bg-white rounded-xl shadow-md">
+    <h2 class="text-2xl font-semibold mb-4">Voice Analysis Phase</h2>
+    <div class="mb-4 text-gray-600">
+        Please speak naturally for at least 20 seconds about your day or feelings
+    </div>
+    
+    <div id="recording-ui" class="space-y-4">
+        <div id="timer" class="text-center text-2xl font-bold">00:20</div>
+        
+        <button id="startBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+            Start Recording
+        </button>
+        
+        <div id="transcription-display" class="p-3 bg-gray-100 rounded-lg text-gray-700 text-sm min-h-[100px] hidden">
+            <p class="font-medium mb-1">Transcription:</p>
+            <p id="transcription" class="italic"></p>
+        </div>
+        
+        <div id="audioPreview" class="hidden"></div>
+        
+        <form id="uploadForm" class="hidden" method="post" action="{% url 'analyze_audio' %}">
+            {% csrf_token %}
+            <input type="hidden" name="transcription" id="transcriptionField">
+            <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+                Submit Recording
+            </button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+let timerInterval;
+const timerDisplay = document.getElementById('timer');
+let transcription = '';
+
+// Initialize speech recognition
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition;
+
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onresult = (event) => {
+        const result = event.results[event.results.length - 1];
+        const transcript = result[0].transcript;
+        transcription += ' ' + transcript;
+        document.getElementById('transcription').textContent = transcription;
+        document.getElementById('transcriptionField').value = transcription;
+    };
+    
+    recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+    };
+}
+
+document.getElementById('startBtn').addEventListener('click', async () => {
+    try {
+        // Start speech recognition
+        if (recognition) {
+            transcription = '';
+            recognition.start();
+        }
+        
+        // Show transcription area
+        document.getElementById('transcription-display').classList.remove('hidden');
+        
+        // Start countdown
+        let timeLeft = 20;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            timerDisplay.textContent = `00:${timeLeft.toString().padStart(2, '0')}`;
+            
+            if(timeLeft <= 0) {
+                clearInterval(timerInterval);
+                if (recognition) {
+                    recognition.stop();
+                }
+                document.getElementById('uploadForm').classList.remove('hidden');
+                document.getElementById('startBtn').disabled = true;
+            }
+        }, 1000);
+    } catch (err) {
+        console.error('Error:', err);
+        alert('Error starting voice analysis');
+    }
+});
+</script>
+
+{% endblock %}

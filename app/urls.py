@@ -13,5 +13,9 @@ urlpatterns = [
     path("assesment/", phq9_view, name="phq9"),
     path('chatbot/', chatbot_view, name='chatbot'),
     path('chat/', chat, name='chat_api'),
+    path('audio-phase/', audio_phase, name='audio_phase'),
+    path('analyze-audio/', analyze_audio, name='analyze_audio'),
+    path('results/<int:result_id>/', final_results, name='final_results'),
+    path('journal/', journal, name='journal'),
     
 ]

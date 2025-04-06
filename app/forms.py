@@ -1,6 +1,6 @@
 
 from django import forms
-
+from .models import JournalEntry
 PHQ_CHOICES = [
     (0, 'Not at all'),
     (1, 'Several days'),
@@ -35,3 +35,19 @@ class ConsultationBookingForm(forms.Form):
     date = forms.DateField(widget=forms.SelectDateWidget(), required=True)
     time = forms.TimeField(widget=forms.TimeInput(attrs={'type': 'time'}), required=True)
     message = forms.CharField(widget=forms.Textarea, required=False)
+
+# forms.py
+
+
+
+class JournalForm(forms.ModelForm):
+    class Meta:
+        model = JournalEntry
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 5,
+                'placeholder': 'Write about your day...'
+            })
+        }

@@ -73,6 +73,13 @@
                             <p class="font-medium">{{ bmi|floatformat:2 }}</p>
                         </div>
                     </div>
+
+                    <div class="container mt-4">
+                        <h2>Mood Trend</h2>
+                        <canvas id="moodChart" width="400" height="200"></canvas>
+                    </div>
+                    
+                    
                 </div>
 
                 <!-- Action Buttons -->
@@ -144,4 +151,47 @@
         }
     }
 </style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('moodChart').getContext('2d');
+        
+        try {
+            const chartData = JSON.parse('{{ chart_data_json|escapejs }}');
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.dates,
+                    datasets: [{
+                        label: 'Positive Sentiment',
+                        data: chartData.positive,
+                        borderColor: '#28a745',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Negative Sentiment',
+                        data: chartData.negative,
+                        borderColor: '#dc3545',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 1
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error initializing chart:', error);
+        }
+    });
+</script>
+                    
 {% endblock %}
