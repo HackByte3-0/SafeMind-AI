@@ -1,128 +1,79 @@
-## 🧠 SafeMind AI — Voice-Driven Mental Health Analysis with Cloudflare & Gemini API
-SafeMind AI is a next-generation voice and text-powered mental well-being platform that uses cutting-edge AI to detect and monitor emotional states. Our goal is to provide individuals with a private and intelligent space to express themselves and gain meaningful insights into their mental health.
+Awesome! Here’s your finalized `README.md` with all the links included for the demo video, screenshots, and system architecture:
 
-## 🌟 Overview
-Mental health is a growing concern in the digital age, yet tools that help users reflect on their emotions are still limited. SafeMind AI bridges that gap using a combination of AI speech recognition, natural language processing, and sentiment analysis to analyze thoughts, feelings, and mood — all in real time.
+---
 
-Whether a user speaks out loud or types their emotions, SafeMind AI captures the data, processes it intelligently, and delivers clear, actionable feedback on their emotional trends.
+# 🧠 SafeMinds AI
 
-## 🔧 Core Technologies
-Component	Technology Used
-Frontend	React.js, Tailwind CSS
-Backend	Flask / FastAPI
-Speech-to-Text	Cloudflare AI Speech Model
-Sentiment Analysis	Gemini API (Google), BERT, GPT-based NLP models
-Database	PostgreSQL / Firebase
-Authentication	Firebase Auth / JWT
-Hosting	Vercel (Frontend), Render / AWS (Backend)
-## 🎯 Features
-🎤 Speech-to-Text Input: Speak directly to the app; your voice is converted into text using Cloudflare AI's Speech Recognition.
+**SafeMinds AI** is a mental health support platform developed by **Team Perplex** for **Hackbyte 3.0**. It leverages artificial intelligence to help users recognize signs of depression and receive helpful, personalized guidance in a private, accessible, and user-friendly way.
 
-✨ AI Sentiment Analysis: Gemini API interprets user inputs to detect emotional tones such as happiness, sadness, anxiety, anger, calmness, etc.
+> _“Promoting mental well-being through accessible, AI-powered tools.”_
 
-📈 Emotional Dashboard: Visualize emotional changes and trends over time.
+---
 
-🔁 Feedback Loop: Personalized suggestions based on past moods and emotional patterns.
+## 🚀 Features
 
-🔐 Private & Secure: No data is stored without encryption or explicit user consent.
+- 🎭 **Real-time Facial Recognition & Emotion Detection**  
+  Uses OpenCV and deep learning to detect facial expressions that reflect emotional states.
 
-🌐 Cross-Platform: Works seamlessly on both mobile and desktop browsers.
+- 🎤 **Voice Sentiment Analysis**  
+  Captures and analyzes vocal input to evaluate emotional tone.
 
-## 🚀 Workflow Pipeline
-User speaks or types their thoughts into the platform
+- 💬 **AI Therapist Chatbot (Gemini 2.0 Flash)**  
+  Provides conversational support through a smart, empathetic AI chatbot.
 
-Cloudflare AI processes speech input and converts it to structured text
+- 📓 **Journal Sentiment Analysis**  
+  Users can maintain a digital journal, analyzed via NLP to detect sentiment trends.
 
-Gemini API + NLP models analyze the text, identifying sentiment, tone, and keywords
+- 📊 **Unified Mental Health Score**  
+  Scores from each module (face, voice, journal, chatbot) are normalized out of 25.
+  > **Higher total score → Greater risk of depression.**
 
-The AI then generates insights, including:
+---
 
-Current emotional status
+## 🧠 Tech Stack
 
-Past emotional pattern comparison
+- **Backend**: Django (Python)
+- **Computer Vision**: OpenCV
+- **Chatbot**: Google Gemini 2.0 Flash
+- **Sentiment Analysis**: Hugging Face DistilBERT
+- **AI/ML**: TensorFlow, Keras
+- **Language**: Python
 
-Suggested actions (e.g., journaling, meditation, reminders)
+---
 
-Data is stored and visualized on the user dashboard
+## 📽️ Demo Video
 
-## 💻 Installation & Setup
-Prerequisites
-Python 3.10+
+🎬 [Watch our demo on YouTube](https://www.youtube.com/watch?v=xy5qrTAVpU4)
 
-Node.js 16+
+---
 
-Cloudflare Account (for Speech API)
+## 🏗️ System Architecture
 
-Google Developer Console (Gemini API key)
+🗂️ [View Architecture Diagram](https://drive.google.com/file/d/1LHs3Jp7uYsk9Zqbw2bjrhgBuSYW2ucEx/view?usp=sharing)
 
-## Clone the Repository
-bash
-Copy
-Edit
-git clone https://github.com/yourusername/safemind-ai.git
-cd safemind-ai
-## Backend Setup (Flask)
-bash
-Copy
-Edit
-cd backend
-pip install -r requirements.txt
-python app.py
-## Frontend Setup (React)
-bash
-Copy
-Edit
-cd frontend
-npm install
-npm run dev
-## Environment Variables (.env example)
-ini
-Copy
-Edit
-CLOUDFLARE_API_KEY=your_cloudflare_api_key
-GEMINI_API_KEY=your_gemini_api_key
-DATABASE_URL=your_database_url
-## 📊 Use Cases
-Daily Emotional Check-In
+---
 
-Mental Health Journaling
+## 📷 Screenshots
 
-AI-Powered Therapy Assistant
+Check out our UI and features:
 
-Sentiment-Based Chat Companion
+📁 [View Screenshots](https://drive.google.com/drive/folders/1Cpo0F-kBngNfoLpkdOz30Hk8PVytodsE?usp=sharing)
 
-Voice Therapy Companion for Elderly or Disabled Users
+---
 
-## 🧠 Future Plans
-🧑‍⚕️ Integrate with real-time therapist chat API
+## 👨‍💻 Team Perplex – Hackbyte 3.0
 
-🗓️ Mood calendar with intelligent recommendations
+- **Ayush Sachan**
+- **Aryan Khandhadiya**
+- **Akshat Bhole**
 
-🧬 Personalized emotional pattern detection using LSTM / Transformers
+---
 
-🌍 Multilingual speech and emotion support
+## 📄 License
 
-📱 Release mobile app on iOS and Android
+This project is licensed under the **MIT License**.  
+See the [LICENSE](LICENSE) file for more details.
 
-## 🤝 Contributing
-We welcome contributors and collaborators to expand SafeMind AI.
-To contribute:
+---
 
-Fork the repository
-
-Create a new branch (git checkout -b feature-name)
-
-Commit your changes
-
-Push to the branch
-
-Open a Pull Request
-
-## 🛡️ License
-MIT License © 2025 Akshat and SafeMind AI Team
-
-## 📬 Contact & Credits
-Developed by:
-SafeMind AI Team
-
-
+Let me know if you want me to generate the `LICENSE` file content as well — I can copy-paste it here for you. Would you also like a one-slide summary or a Notion/portfolio-friendly write-up?
