@@ -49,7 +49,7 @@ Awesome! Here’s your finalized `README.md` with all the links included for the
 
 ## 🏗️ System Architecture
 
-🗂️ [View Architecture Diagram](https://drive.google.com/file/d/1LHs3Jp7uYsk9Zqbw2bjrhgBuSYW2ucEx/view?usp=sharing)
+🗂️ ![View Architecture Diagram](https://github.com/user-attachments/assets/00b7a105-9b83-4de6-ac31-bf9011daa99d)
 
 ---
 
